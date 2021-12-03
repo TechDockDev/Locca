@@ -21,9 +21,8 @@ class LocationService  : Service() {
 
     companion object{
         const val NOTIFICATION_CHANNEL_ID = "LoccaID"
+        var isServiceStarted = false
     }
-
-    private var isServiceStarted = false
 
     override fun onCreate() {
         super.onCreate()

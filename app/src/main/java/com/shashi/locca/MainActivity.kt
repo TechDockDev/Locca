@@ -25,11 +25,17 @@ class MainActivity : AppCompatActivity() {
 
         if (!checkPermission()) {
             requestPermission()
+
         }else{
 
             if (isLocationEnabled())
             {
-                ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+                if(!LocationService.isServiceStarted)
+                {
+                    ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+                }else{
+                    Toast.makeText(applicationContext,"Service already running...",Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -58,11 +64,12 @@ class MainActivity : AppCompatActivity() {
                 if (isLocationEnabled())
                 {
                     ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+                }else{
+                    Toast.makeText(applicationContext,"Location not enabled..Enable location and then restart app to start the service.",Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
 
     private fun isLocationEnabled(): Boolean {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -85,7 +92,6 @@ class MainActivity : AppCompatActivity() {
                 }
             )
         }
-
         return gpsEnabled
     }
 
