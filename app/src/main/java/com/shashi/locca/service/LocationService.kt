@@ -10,7 +10,14 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.shashi.locca.R
+import com.shashi.locca.preferences.UserPreferences
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.random.Random
 
 /**
  * @author: Shashi
@@ -51,12 +58,19 @@ class LocationService  : Service() {
         LocationHelper().startListeningUserLocation(
             this, object : MyLocationListener {
                 override fun onLocationChanged(location: Location?) {
-
                     //Here we will get the location
                     Log.d("LocationTAG:","Location is:${location?.latitude}, ${location?.longitude}")
+                    updateLocation(location)
                 }
             })
         return START_STICKY
+    }
+
+    private fun updateLocation(location: Location?) {
+        CoroutineScope(Main).launch {
+            val r = Random(10000).nextInt(999999)
+            UserPreferences.setLocation(applicationContext,"$r:\nLat:${location?.latitude}, Lng:${location?.longitude}")
+        }
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -64,6 +78,7 @@ class LocationService  : Service() {
     }
 
     override fun onDestroy() {
+        updateLocation(null)
         super.onDestroy()
         isServiceStarted = false
     }
